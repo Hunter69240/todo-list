@@ -1,118 +1,129 @@
-import React ,{useState} from 'react';
-
-import { StyleSheet, 
-  Text, 
+import React, { useState } from 'react';
+import {
+  StyleSheet,
+  Text,
   View,
   Platform,
   TouchableOpacity,
   Keyboard,
+  TextInput,
+  KeyboardAvoidingView,
+  TouchableWithoutFeedback,
+  ScrollView
 } from 'react-native';
 import Task from './components/Task';
-import { KeyboardAvoidingView, TextInput } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
 export default function App() {
-  const [task,setTask]=useState()
-  const [taskitems,settaskitems]=useState([])
-  const handleaddtask =()=>{
-    Keyboard.dismiss()
-    settaskitems([...taskitems,task])
-    setTask(null)
-  }
+  const [task, setTask] = useState();
+  const [taskitems, settaskitems] = useState([]);
 
-  const completetask=(index)=>{
-    let itemsCopy=[...taskitems]
-    itemsCopy.splice(index,1)
-    settaskitems(itemsCopy)
-  }
+  const handleaddtask = () => {
+    if (task?.trim()) {
+      settaskitems([...taskitems, task]);
+      setTask(null);
+    }
+    Keyboard.dismiss();
+  };
+
+  const completetask = (index) => {
+    let itemsCopy = [...taskitems];
+    itemsCopy.splice(index, 1);
+    settaskitems(itemsCopy);
+  };
+
   return (
-    <View style={styles.container}>
-        <View style={styles.listwrapper}>
-          <Text style={styles.task}>Todays Task</Text>
-        </View>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#E8EAED' }}>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 60 : 0}
+      >
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <View style={styles.inner}>
+            
+            {/* Header */}
+            <View style={styles.listwrapper}>
+              <Text style={styles.task}>Today's Tasks</Text>
+            </View>
 
-        <View style={styles.items}>
-          {
-            taskitems.map((item,index)=>{
-              return (
-                <TouchableOpacity  key={index} onPress={()=>completetask(index)}>
-                   <Task text={item}></Task>
+            {/* Task List */}
+            <ScrollView contentContainerStyle={styles.items}>
+              {taskitems.map((item, index) => (
+                <TouchableOpacity key={index} onPress={() => completetask(index)}>
+                  <Task text={item} />
                 </TouchableOpacity>
-              ) 
-             
-            })
-          }
-          {/* <Task text={'Task 1'}/>
-          <Task text={'Task 2'}/>
-          <Task text={'Task 3'}/> */}
-        </View>
+              ))}
+            </ScrollView>
 
-        <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" :"height"}
-        style={styles.writetaskwrapper}
-        >
-          <TextInput
-          style={styles.input}
-          placeholder='Write Task here'
-          onChangeText={(text)=>setTask(text)}
-          value={task}/>
-          <TouchableOpacity
-          onPress={()=>handleaddtask()}>
-          <View style={styles.addwrapper}>
-            <Text style={styles.addText}>+</Text>
-          </View>
-        </TouchableOpacity>
-        </KeyboardAvoidingView>
+            {/* Input Area */}
+            <View style={styles.writetaskwrapper}>
+              <TextInput
+                style={styles.input}
+                placeholder='Write task here'
+                onChangeText={(text) => setTask(text)}
+                value={task}
+              />
+              <TouchableOpacity onPress={handleaddtask}>
+                <View style={styles.addwrapper}>
+                  <Text style={styles.addText}>+</Text>
+                </View>
+              </TouchableOpacity>
+            </View>
 
-        {/* <TouchableOpacity>
-          <View style={styles.addwrapper}>
-            <Text style={styles.addText}>+</Text>
           </View>
-        </TouchableOpacity> */}
-    </View>
+        </TouchableWithoutFeedback>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  inner: {
     flex: 1,
+    justifyContent: 'space-between',
+  },
+  listwrapper: {
+    paddingTop: 80,
+    paddingHorizontal: 20,
+  },
+  task: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
+  },
+  items: {
+    paddingHorizontal: 20,
+    paddingBottom: 10,
+  },
+  writetaskwrapper: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: Platform.OS === 'android' ? 0 : 10,
     backgroundColor: '#E8EAED',
   },
-  listwrapper:{
-    paddingTop:80,  
-    paddingHorizontal:20
+  input: {
+    padding: 15,
+    width: 250,
+    backgroundColor: '#fff',
+    borderRadius: 60,
+    borderColor: '#C0C0C0',
+    borderWidth: 1,
   },
-  task:{
-    fontSize:24,
-    fontWeight:'bold'
+  addwrapper: {
+    width: 60,
+    height: 60,
+    backgroundColor: '#fff',
+    borderRadius: 60,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderColor: '#C0C0C0',
+    borderWidth: 1,
   },
-  items:{
-    marginTop:30
+  addText: {
+    fontSize: 24,
+    color: '#55BCF6',
   },
-  writetaskwrapper:{
-    position:'absolute',
-    bottom:60,
-    width:'100%',
-    flexDirection:'row',
-    justifyContent:'space-around',
-    alignItems:'center'
-  },
-  input:{
-    padding:15,
-    width:250,
-    paddingHorizontal:15,
-    backgroundColor:'#fff',
-    borderRadius:60,
-    borderColor:'#C0C0C0',
-    borderWidth:1
-  },
-  addwrapper:{
-    width:60,
-    height:60,
-    backgroundColor:'#fff',
-    borderRadius:60,
-    justifyContent:'center',
-    alignItems:'center',
-    borderColor:'#C0C0C0',
-    borderWidth:1
-  },
-  addText:{},
 });
